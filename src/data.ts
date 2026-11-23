@@ -128,18 +128,30 @@ export type Pretre = readonly [
   photo?: string, // ex. '/pretres/nlebe.jpg' (fichier dans public/pretres/)
 ]
 
-export const PRIETRES: readonly Pretre[] = [
+/** Depuis la paroisse (2002), du plus récent au plus ancien. */
+export const CURES: readonly Pretre[] = [
+  // ➜ Remplacez cette entrée par le curé actuel : nom, date d’installation, fonction, photo.
   [
-    'Abbé Joseph Nlebe',
-    '1986–1990',
-    'Premier aumônier',
-    'Installé le 22 février 1986, il pose les bases de la communauté catholique du campus avec la JECU. Une messe est célébrée chaque samedi soir.',
+    'Les frères dominicains',
+    'Aujourd’hui',
+    'Paroisse confiée à l’Ordre des Prêcheurs',
+    'La paroisse universitaire est animée par les frères dominicains, qui vivent au couvent Saint-Joseph, à Kotto.',
   ],
   [
-    'Abbé Sébastien Mongo Behon',
-    'à partir de 1990',
-    'Aumônier',
-    'Il succède à l’abbé Nlebe et accompagne la communauté qui grandit.',
+    'Père Dominique Charles, o.p.',
+    'vers 2002–2009',
+    'Curé de la paroisse universitaire',
+    'Dominicain et médecin de formation, curé pendant sept ans. L’église est consacrée le 7 mai 2005.',
+  ],
+]
+
+/** Avant la paroisse : aumônerie universitaire, du plus récent au plus ancien. */
+export const AUMONIERS: readonly Pretre[] = [
+  [
+    'Abbé Léon Marie Bolla',
+    'vers 1994–1995',
+    'Curé de Saint-Paul de Nylon, vicaire épiscopal',
+    'L’archevêque lui confie les étudiants pendant une année exigeante, pour garder des célébrations régulières.',
   ],
   [
     'Abbé Fotso',
@@ -148,25 +160,20 @@ export const PRIETRES: readonly Pretre[] = [
     'Aumônier à la création de l’Université de Douala en 1993, il est affecté ailleurs l’année suivante.',
   ],
   [
-    'Abbé Léon Marie Bolla',
-    'vers 1994–1995',
-    'Curé de Saint-Paul de Nylon, vicaire épiscopal',
-    'L’archevêque lui confie les étudiants pendant une année exigeante, pour garder des célébrations régulières.',
+    'Abbé Sébastien Mongo Behon',
+    'à partir de 1990',
+    'Aumônier',
+    'Il succède à l’abbé Nlebe et accompagne la communauté qui grandit.',
   ],
   [
-    'Père Dominique Charles, o.p.',
-    'vers 2002–2009',
-    'Curé de la paroisse universitaire',
-    'Dominicain et médecin de formation, curé pendant sept ans. L’église est consacrée le 7 mai 2005.',
-  ],
-  // ➜ Remplacez cette entrée par le curé actuel : nom, date d’installation, fonction, photo.
-  [
-    'Les frères dominicains',
-    'Aujourd’hui',
-    'Paroisse confiée à l’Ordre des Prêcheurs',
-    'La paroisse universitaire est animée par les frères dominicains, qui vivent au couvent Saint-Joseph, à Kotto.',
+    'Abbé Joseph Nlebe',
+    '1986–1990',
+    'Premier aumônier',
+    'Installé le 22 février 1986, il pose les bases de la communauté catholique du campus avec la JECU. Une messe est célébrée chaque samedi soir.',
   ],
 ]
+
+export const PRIETRES: readonly Pretre[] = [...CURES, ...AUMONIERS]
 export const ANNO: [string, number, number, string][] = [
   ['Toiture en brique', 30, 46, 'La brique rouge évoque la terre cuite des maisons du quartier : l’église est faite du même matériau que ses fidèles.'],
   ['Fenêtres cintrées', 18, 77, 'Leurs arcs rappellent les voûtes romanes et laissent entrer une lumière douce pendant la prière.'],

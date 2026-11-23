@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { EASE } from '../lib/motion'
+import { DURATION, EASE } from '../lib/motion'
 
 export default function Words({ text, delay = 0 }: { text: string; delay?: number }) {
   return (
@@ -14,7 +14,7 @@ export default function Words({ text, delay = 0 }: { text: string; delay?: numbe
             className="inline-block"
             initial={{ y: '110%' }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.8, ease: EASE, delay: delay + i * 0.08 }}
+            transition={{ duration: DURATION, ease: EASE, delay: delay + i * 0.08 }}
           >
             {w}
           </motion.span>

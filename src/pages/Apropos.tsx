@@ -1,25 +1,23 @@
 import { useRef, useState, type UIEvent } from 'react'
 import { ChevronDown } from 'lucide-react'
-import {
-  AnimatePresence,
-  MotionConfig,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from 'motion/react'
+import { MotionConfig, motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import Band from '../components/Band'
 import Church from '../components/Church'
 import PageTransition from '../components/PageTransition'
-import ReadingProgress from '../components/ReadingProgress'
-import Reveal, { type RevealVariant } from '../components/Reveal'
+import Reveal from '../components/Reveal'
 import Rise from '../components/Rise'
+import SaintThomas from '../components/SaintThomas'
 import Words from '../components/Words'
-import { EASE, SPRING, press } from '../lib/motion'
-import { ANNO, FOUND, NOTRE_HISTOIRE, PRIETRES } from '../data'
+import { DURATION, EASE, SPRING, press } from '../lib/motion'
+import { ANNO, AUMONIERS, CURES, FOUND, NOTRE_HISTOIRE, type Pretre } from '../data'
 
-// Une entrée différente pour chaque carte de prêtre (le curé actuel a la sienne).
-const CARD_FX: RevealVariant[] = ['tilt', 'flip', 'blur', 'left', 'scale', 'right']
+const TILTS = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2']
+
+const SIZES = {
+  md: 'mb-3 h-24 w-18 text-xl',
+  lg: 'h-32 w-24 text-3xl',
+  sm: 'mb-3 h-20 w-14 text-lg',
+}
 
 const ini = (n: string) =>
   n
@@ -30,26 +28,66 @@ const ini = (n: string) =>
     .slice(0, 2)
     .toUpperCase()
 
-const Avatar = ({ n, photo }: { n: string; photo?: string }) => (
-  <motion.div
-    whileHover={{ rotate: -3, scale: 1.06 }}
-    transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-    className="mb-3 h-24 w-18 origin-bottom overflow-hidden rounded-t-full rounded-b-lg bg-linear-to-b from-sable to-[#d9ad6c]"
-  >
-    {photo ? (
-      <img src={photo} alt={n} loading="lazy" className="size-full object-cover" />
-    ) : (
-      <div
-        aria-hidden="true"
-        className="grid size-full place-items-center font-serif text-xl font-bold text-brique-d"
-      >
-        {ini(n)}
-      </div>
-    )}
-  </motion.div>
-)
+function Avatar({
+  n,
+  photo,
+  size = 'md',
+}: {
+  n: string
+  photo?: string
+  size?: keyof typeof SIZES
+}) {
+  return (
+    <motion.div
+      whileHover={{ rotate: -3, scale: 1.06 }}
+      transition={SPRING}
+      className={`${SIZES[size]} shrink-0 origin-bottom overflow-hidden rounded-t-full rounded-b-lg bg-linear-to-b from-sable to-[#d9ad6c]`}
+    >
+      {photo ? (
+        <img src={photo} alt={n} loading="lazy" className="size-full object-cover" />
+      ) : (
+        <div
+          aria-hidden="true"
+          className="grid size-full place-items-center font-serif font-bold text-brique-d"
+        >
+          {ini(n)}
+        </div>
+      )}
+    </motion.div>
+  )
+}
 
-/** Pulsation unique + pastille pour le prêtre en fonction aujourd'hui. */
+function PretreCard({ p, size }: { p: Pretre; size: 'lg' | 'sm' }) {
+  const [n, y, k, m, photo] = p
+
+  if (size === 'lg') {
+    return (
+      <div className="flex h-full items-start gap-5">
+        <Avatar n={n} photo={photo} size="lg" />
+        <div>
+          <h4 className="text-2xl leading-tight font-bold">{n}</h4>
+          <small className="block text-encre/70">
+            {y}, {k}
+          </small>
+          <p className="mt-2">{m}</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Avatar n={n} photo={photo} size="sm" />
+      <h4 className="text-lg leading-tight font-bold">{n}</h4>
+      <small className="block text-encre/70">
+        {y}, {k}
+      </small>
+      <p className="mt-2 text-sm">{m}</p>
+    </>
+  )
+}
+
+/** Pulsation unique + pastille pour la carte « aujourd'hui ». */
 function Spotlight() {
   return (
     <>
@@ -59,12 +97,32 @@ function Spotlight() {
         initial={{ opacity: 0.9, scale: 1 }}
         whileInView={{ opacity: 0, scale: 1.06 }}
         viewport={{ once: true }}
-        transition={{ duration: 1.1, delay: 0.7, ease: EASE }}
+        transition={{ duration: DURATION, delay: 0.7, ease: EASE }}
       />
       <span className="absolute top-4 right-4 rounded-full bg-brique-d px-3 py-1 text-xs font-bold text-white">
         Aujourd’hui
       </span>
     </>
+  )
+}
+
+/** Arches en filigrane : fond de la section des prêtres. */
+function Arches() {
+  return (
+    <svg
+      viewBox="0 0 1200 420"
+      preserveAspectRatio="xMidYMax slice"
+      className="absolute inset-x-0 bottom-0 h-full w-full text-white/70"
+    >
+      <g fill="none" stroke="currentColor" strokeWidth="2">
+        {[60, 440, 820].map((x) => (
+          <g key={x}>
+            <path d={`M${x} 420 V230 a150 150 0 0 1 300 0 V420`} />
+            <path d={`M${x + 36} 420 V236 a114 114 0 0 1 228 0 V420`} />
+          </g>
+        ))}
+      </g>
+    </svg>
   )
 }
 
@@ -102,8 +160,6 @@ export default function Apropos() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <ReadingProgress />
-
       <PageTransition>
         {/* HERO */}
         <section
@@ -116,7 +172,7 @@ export default function Apropos() {
                 className="mb-2 font-bold text-soleil"
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, ease: EASE, delay: 0.05 }}
+                transition={{ duration: DURATION, ease: EASE, delay: 0.05 }}
               >
                 À propos
               </motion.p>
@@ -132,7 +188,7 @@ export default function Apropos() {
                 className="mt-4 max-w-md text-lg text-white/90"
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: EASE, delay: 0.65 }}
+                transition={{ duration: DURATION, ease: EASE, delay: 0.65 }}
               >
                 L’histoire de l’église Saint Thomas d’Aquin, de ses fondateurs
                 et des prêtres qui l’ont servie.
@@ -143,7 +199,7 @@ export default function Apropos() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.94, y: 24 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 1, ease: EASE, delay: 0.35 }}
+                transition={{ duration: DURATION, ease: EASE, delay: 0.35 }}
               >
                 <Church className="w-full" />
               </motion.div>
@@ -199,7 +255,7 @@ export default function Apropos() {
               initial={{ opacity: 0, x: -16 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: EASE }}
+              transition={{ duration: DURATION, ease: EASE }}
             >
               Mémoire et patrimoine
             </motion.span>
@@ -231,7 +287,7 @@ export default function Apropos() {
                       initial={{ opacity: 0.5, x: -8 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ root: scrollerRef, margin: '-35% 0px -35% 0px' }}
-                      transition={{ duration: 0.4, ease: EASE }}
+                      transition={{ duration: DURATION, ease: EASE }}
                     >
                       <span className="inline-flex items-center rounded-full bg-soleil px-3.5 py-1 text-xs font-extrabold text-brique-d shadow-sm">
                         {item.periode}
@@ -256,8 +312,13 @@ export default function Apropos() {
                   <motion.span
                     aria-hidden="true"
                     className="inline-flex"
-                    animate={{ y: [0, 4, 0] }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                    animate={{ y: 4 }}
+                    transition={{
+                      duration: DURATION,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                    }}
                   >
                     <ChevronDown className="h-4 w-4 text-soleil" />
                   </motion.span>
@@ -270,10 +331,10 @@ export default function Apropos() {
             <Reveal variant="right" delay={0.15} className="md:col-span-6">
               <div
                 ref={cardRef}
-                className="group relative h-90 w-full overflow-hidden rounded-2xl border border-sable/50 bg-[#eadfc8] shadow-2xl shadow-black/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-black/40 md:h-105"
+                className="group relative h-90 w-full overflow-hidden rounded-2xl border border-sable/50 bg-[#eadfc8] shadow-2xl shadow-black/30 transition-all duration-800 hover:-translate-y-1 hover:shadow-black/40 md:h-105"
               >
                 <motion.div style={{ y: cardY }} className="absolute inset-0 grid place-items-center">
-                  <div className="text-center transition-transform duration-500 group-hover:scale-105">
+                  <div className="text-center transition-transform duration-800 group-hover:scale-105">
                     <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-white/70 text-brique">
                       <Church className="h-7 w-7" />
                     </div>
@@ -292,141 +353,147 @@ export default function Apropos() {
           </div>
         </Band>
 
-        <div className="wrap">
-          {/* LES FONDATEURS */}
-          <section className="py-10">
-            <h2 className="mb-6 text-3xl font-bold text-encre">
-              <Rise>Les fondateurs</Rise>
-            </h2>
+        {/* LES FONDATEURS */}
+        <Band tone="blanc" label="Les fondateurs" className="py-14 md:py-20">
+          <h2 className="mb-6 text-3xl font-bold text-encre">
+            <Rise>Les fondateurs</Rise>
+          </h2>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              {FOUND.map(([n, r, an], i) => (
-                <Reveal key={n} delay={i * 0.08} lift className="card">
-                  <Avatar n={n} />
+          <div className="grid gap-4 md:grid-cols-3">
+            {FOUND.map(([n, r, an], i) => (
+              <Reveal key={n} delay={i * 0.08} lift className="card">
+                <Avatar n={n} />
 
-                  <h3 className="text-xl">{n}</h3>
+                <h3 className="text-xl">{n}</h3>
 
-                  <small className="block text-encre/70">{r}</small>
+                <small className="block text-encre/70">{r}</small>
 
-                  <p className="mt-2">{an}</p>
+                <p className="mt-2">{an}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Band>
+
+        {/* LES PRÊTRES : du plus récent au plus ancien */}
+        <Band
+          tone="sarcelle"
+          label="Les prêtres de la paroisse"
+          decor={<Arches />}
+          className="py-16 md:py-24"
+        >
+          <h2 className="mb-2 text-3xl font-bold text-encre">
+            <Rise>Les prêtres de la paroisse</Rise>
+          </h2>
+
+          <Reveal>
+            <p className="mb-12 max-w-[62ch] text-encre/75">Du plus récent au plus ancien.</p>
+          </Reveal>
+
+          {/* Depuis la paroisse */}
+          <h3 className="text-xl font-bold text-brique-d md:text-2xl">
+            <Rise>Depuis 2002 : la paroisse Saint-Thomas-d’Aquin</Rise>
+          </h3>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-5">
+            {CURES.map((p, i) => {
+              const current = i === 0
+              return (
+                <Reveal
+                  key={p[0]}
+                  variant={current ? 'zoom' : 'swing'}
+                  delay={i * 0.12}
+                  lift
+                  className={'card relative ' + (current ? 'bg-soleil! md:col-span-3' : 'md:col-span-2')}
+                >
+                  {current && <Spotlight />}
+                  <PretreCard p={p} size="lg" />
                 </Reveal>
-              ))}
-            </div>
-          </section>
+              )
+            })}
+          </div>
 
-          {/* LES PRÊTRES */}
-          <section className="py-10">
-            <h2 className="mb-2 text-3xl font-bold text-encre">
-              <Rise>Les prêtres de la paroisse</Rise>
-            </h2>
+          {/* Avant la paroisse */}
+          <h3 className="mt-16 text-xl font-bold text-brique-d md:text-2xl">
+            <Rise>Avant la paroisse : l’aumônerie universitaire</Rise>
+          </h3>
 
-            <Reveal>
-              <p className="mb-6 max-w-[62ch] text-encre/75">
-                De l’aumônerie étudiante des années 1980 à la paroisse universitaire d’aujourd’hui.
-              </p>
-            </Reveal>
+          <Reveal>
+            <p className="mt-2 max-w-[62ch] text-encre/75">
+              Les aumôniers de la communauté catholique du campus, de 1986 à 1995 environ.
+            </p>
+          </Reveal>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {PRIETRES.map(([n, y, k, m, photo], i) => {
-                const current = i === PRIETRES.length - 1
-                return (
-                  <Reveal
-                    key={n}
-                    variant={current ? 'scale' : CARD_FX[i % CARD_FX.length]}
-                    delay={(i % 3) * 0.08}
-                    lift
-                    className={'card relative ' + (current ? 'bg-soleil!' : '')}
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {AUMONIERS.map((p, i) => (
+              <Reveal key={p[0]} variant="deal" delay={i * 0.12} lift className="h-full">
+                <div className={'card h-full ' + TILTS[i % TILTS.length]}>
+                  <PretreCard p={p} size="sm" />
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Band>
+
+        {/* REPÈRES HISTORIQUES */}
+        <Band tone="sable" label="Repères historiques" className="py-14 md:py-20">
+          <Reveal variant="scale">
+            <div className="card">
+              <div
+                role="group"
+                aria-label="Repères historiques"
+                className="mb-4 flex flex-wrap gap-2"
+              >
+                {ANNO.map((r, i) => (
+                  <motion.button
+                    key={`${i}-${r[0]}`}
+                    type="button"
+                    aria-pressed={a === i}
+                    aria-label={r[0]}
+                    onClick={() => setA(a === i ? -1 : i)}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={SPRING}
+                    className={
+                      'grid size-11 place-items-center rounded-full border text-sm font-bold transition-colors duration-800 ' +
+                      (a === i
+                        ? 'border-brique bg-brique text-white'
+                        : 'border-sable bg-white text-brique-d hover:bg-sable/30')
+                    }
                   >
-                    {current && <Spotlight />}
-
-                    <Avatar n={n} photo={photo} />
-
-                    <h3 className="text-xl">{n}</h3>
-
-                    <small className="block text-encre/70">
-                      {y}, {k}
-                    </small>
-
-                    <p className="mt-2">{m}</p>
-                  </Reveal>
-                )
-              })}
-            </div>
-          </section>
-
-          {/* REPÈRES HISTORIQUES */}
-          <section className="py-10">
-            <Reveal variant="scale">
-              <div className="card mt-3">
-                <div role="group" aria-label="Repères historiques" className="mb-4 flex flex-wrap gap-2">
-                  {ANNO.map((r, i) => (
-                    <motion.button
-                      key={`${i}-${r[0]}`}
-                      type="button"
-                      aria-pressed={a === i}
-                      aria-label={r[0]}
-                      onClick={() => setA(a === i ? -1 : i)}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.92 }}
-                      transition={SPRING}
-                      className={
-                        'grid size-11 place-items-center rounded-full border text-sm font-bold transition-colors ' +
-                        (a === i
-                          ? 'border-brique bg-brique text-white'
-                          : 'border-sable bg-white text-brique-d hover:bg-sable/30')
-                      }
-                    >
-                      {i + 1}
-                    </motion.button>
-                  ))}
-                </div>
-
-                <div aria-live="polite">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={a}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      {a < 0 ? (
-                        <p>Touchez un repère numéroté pour découvrir sa signification.</p>
-                      ) : (
-                        <>
-                          <h3 className="text-xl">{ANNO[a][0]}</h3>
-                          <p>{ANNO[a][3]}</p>
-                        </>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
+                    {i + 1}
+                  </motion.button>
+                ))}
               </div>
-            </Reveal>
-          </section>
 
-          {/* SAINT PATRON */}
-          <section className="py-10">
-            <h2 className="mb-6 text-3xl font-bold text-encre">
-              <Rise>Saint Thomas d’Aquin, saint notre patron</Rise>
-            </h2>
+              <div aria-live="polite">
+                <motion.div
+                  key={a}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: DURATION, ease: EASE }}
+                >
+                  {a < 0 ? (
+                    <p>Touchez un repère numéroté pour découvrir sa signification.</p>
+                  ) : (
+                    <>
+                      <h3 className="text-xl">{ANNO[a][0]}</h3>
+                      <p>{ANNO[a][3]}</p>
+                    </>
+                  )}
+                </motion.div>
+              </div>
+            </div>
+          </Reveal>
+        </Band>
 
-            <Reveal variant="left">
-              <p className="max-w-[68ch] leading-relaxed text-encre/85">
-                Né vers 1225 et mort en 1274, Thomas d’Aquin était frère
-                dominicain, théologien et professeur. Auteur de la{' '}
-                <i>Somme théologique</i>, il a cherché toute sa vie à montrer
-                que la raison et la foi s’éclairent l’une l’autre. Docteur de
-                l’Église, il est fêté le 28 janvier. C’est cette recherche de
-                lumière que la paroisse a voulu mettre sous son patronage.
-              </p>
-            </Reveal>
-          </section>
+        {/* QUI ÉTAIT SAINT THOMAS D'AQUIN : composant imbriqué */}
+        <SaintThomas />
 
-          {/* APPEL À L'ACTION */}
+        {/* APPEL À L'ACTION */}
+        <Band tone="blanc" label="Rejoignez-nous" className="py-14 md:py-20">
           <Reveal
             variant="scale"
-            className="mt-14 rounded-3xl bg-soleil p-8 text-center text-[#2a2118]"
+            className="rounded-3xl bg-soleil p-8 text-center text-[#2a2118]"
           >
             <h3 className="mb-4 text-3xl">Venez écrire la suite avec nous</h3>
 
@@ -441,11 +508,11 @@ export default function Apropos() {
             </div>
           </Reveal>
 
-          <p className="mt-4 pb-8 text-sm text-encre/70">
+          <p className="mt-4 text-sm text-encre/70">
             Noms, dates et anecdotes de cette page sont des exemples à remplacer
             dans src/data.ts.
           </p>
-        </div>
+        </Band>
       </PageTransition>
     </MotionConfig>
   )

@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 
-type Tone = 'blanc' | 'sable' | 'brique'
+type Tone = 'blanc' | 'sable' | 'brique' | 'sarcelle'
 
 const TONES: Record<Tone, { section: string; glowA: string; glowB: string }> = {
   blanc: { section: 'bg-white text-encre', glowA: '', glowB: '' },
@@ -15,6 +15,11 @@ const TONES: Record<Tone, { section: string; glowA: string; glowB: string }> = {
     glowA: 'bg-soleil/10',
     glowB: 'bg-white/5',
   },
+  sarcelle: {
+    section: 'bg-sarcelle/30 text-encre',
+    glowA: 'bg-white/60',
+    glowB: 'bg-brique/10',
+  },
 }
 
 type BandProps = {
@@ -23,6 +28,7 @@ type BandProps = {
   id?: string
   className?: string
   innerClassName?: string
+  decor?: ReactNode
   children: ReactNode
 }
 
@@ -32,6 +38,7 @@ export default function Band({
   id,
   className = 'py-16 md:py-24',
   innerClassName = '',
+  decor,
   children,
 }: BandProps) {
   const ref = useRef<HTMLElement>(null)
@@ -62,6 +69,7 @@ export default function Band({
           className={`pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full blur-3xl ${t.glowB}`}
         />
       )}
+      {decor && <div aria-hidden="true" className="pointer-events-none absolute inset-0">{decor}</div>}
       <div className={`wrap relative ${innerClassName}`}>{children}</div>
     </section>
   )
