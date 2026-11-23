@@ -155,9 +155,6 @@ export default function App() {
         </motion.main>
       </AnimatePresence>
 
-      <footer className="wrap mb-24 mt-16 border-t border-sable/50 pt-6 text-sm text-encre/70">
-        © {new Date().getFullYear()} Église Saint Thomas d’Aquin · Mentions légales
-      </footer>
 
       <button
         type="button"

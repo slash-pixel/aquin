@@ -31,10 +31,25 @@ export const SLOTS: Slot[] = [
 ]
 
 export const CATS: Record<string, [string, string]> = {
-  fetes: ['Fêtes liturgiques', '#9B3322'], retraites: ['Retraites', '#6B4C9A'], kermesses: ['Kermesses', '#B07A0E'],
-  catechese: ['Catéchèse', '#2F7F86'], jeunes: ['Jeunes', '#D2693A'], caritatives: ['Œuvres caritatives', '#3F7D32'],
+  fetes: ['Fêtes liturgiques', '#9B3322'],
+  retraites: ['Retraites', '#6B4C9A'],
+  kermesses: ['Kermesses', '#B07A0E'],
+  catechese: ['Catéchèse', '#2F7F86'],
+  jeunes: ['Jeunes', '#D2693A'],
+  caritatives: ['Œuvres caritatives', '#3F7D32'],
 }
-const e = (d: string, t: string, cat: string, title: string, place: string, desc: string, major = false, reg = false): Omit<Ev, 'id'> => ({ d, t, cat, title, place, desc, major, reg })
+
+const e = (
+  d: string,
+  t: string,
+  cat: string,
+  title: string,
+  place: string,
+  desc: string,
+  major = false,
+  reg = false,
+): Omit<Ev, 'id'> => ({ d, t, cat, title, place, desc, major, reg })
+
 export const EVENTS: Ev[] = [
   e('2026-11-14', '15:00', 'catechese', 'Éveil à la foi des enfants', 'Salle paroissiale', 'Jeux et récits bibliques pour les 4 à 7 ans.', false, true),
   e('2026-11-21', '14:00', 'kermesses', 'Kermesse d’automne', 'Cour de la paroisse', 'Stands, jeux et repas partagé au profit des travaux de l’église.', false, true),
@@ -71,6 +86,7 @@ export const ANNONCES = [
   { urgent: true, titre: 'Messe pour les défunts', date: 'Samedi 14 novembre', texte: 'Messe à 18 h, suivie d’un temps de prière.' },
   { urgent: false, titre: 'Inscriptions au catéchisme', date: 'Jusqu’au 15 janvier', texte: 'Dossiers disponibles au secrétariat.' },
 ]
+
 export const NOTRE_HISTOIRE: HistoireStep[] = [
   {
     periode: 'Années 1980',
@@ -79,7 +95,7 @@ export const NOTRE_HISTOIRE: HistoireStep[] = [
       'Avant d’avoir des murs, un clocher et un nom officiel, notre communauté est née d’un élan de foi au cœur du Centre Universitaire de Douala (ancêtre de l’actuelle Université de Douala, qui regroupait alors l’ESSEC et l’ENSET).',
       'Sans lieu de culte dédié, les véritables pionniers furent les étudiants eux-mêmes, portés par la Jeunesse Étudiante Chrétienne (JEC). Leur première « base » se résumait aux chambres de la cité universitaire et aux amphithéâtres empruntés le dimanche. À cette époque, on ne parlait pas encore de paroisse, mais simplement de l’aumônerie catholique du campus.',
     ],
-    archive: 'Archive — L’aumônerie catholique du campus (Années 1980)',
+    archive: 'Archive, L’aumônerie catholique du campus (Années 1980)',
   },
   {
     periode: 'Début des années 1990',
@@ -87,16 +103,16 @@ export const NOTRE_HISTOIRE: HistoireStep[] = [
     paragraphes: [
       'Au fil des années, la ferveur grandit. Sous l’impulsion du Père Meinrad Hebga (éminent prêtre jésuite et anthropologue camerounais), le groupe de prière charismatique Ephphata voit le jour sur le campus. Ce souffle nouveau attire non seulement des centaines d’étudiants, mais aussi les fidèles des quartiers voisins d’Ange Raphaël et de Ndogbong. Les salles de cours deviennent trop étroites : la communauté a besoin d’un toit.',
     ],
-    archive: 'Archive — Le groupe Ephphata et les fidèles d’Ange Raphaël (Années 1990)',
+    archive: 'Archive, Le groupe Ephphata et les fidèles d’Ange Raphaël (Années 1990)',
   },
   {
-    periode: '1993 – 2002',
+    periode: '1993 à 2002',
     titre: 'La reconnaissance et le choix d’un nom',
     paragraphes: [
       'L’arrivée du Cardinal Christian Tumi à la tête de l’archidiocèse de Douala en 1993 marque un tournant décisif. Sensible à l’encadrement spirituel et intellectuel de la jeunesse, il dote l’aumônerie d’un terrain fixe à proximité immédiate du campus d’Ange Raphaël.',
       'En 2002, il franchit une étape historique en érigeant officiellement la communauté en Paroisse Universitaire. C’est à ce moment qu’elle abandonne son appellation générique d’aumônerie pour prendre le nom de Saint-Thomas-d’Aquin.',
     ],
-    archive: 'Archive — Érection en Paroisse Universitaire (1993 – 2002)',
+    archive: 'Archive, Érection en Paroisse Universitaire (1993 à 2002)',
   },
   {
     periode: 'Saint Patron',
@@ -104,7 +120,7 @@ export const NOTRE_HISTOIRE: HistoireStep[] = [
     paragraphes: [
       'Pour une paroisse nichée au cœur du monde académique, il fallait un saint patron à son image. Théologien et philosophe majeur, Saint Thomas d’Aquin est le saint patron des universités et des étudiants. Ce nom incarne l’identité profonde de notre église : un lieu où la foi et la raison dialoguent, permettant aux étudiants, enseignants et riverains de nourrir à la fois leur intelligence et leur vie spirituelle.',
     ],
-    archive: 'Archive — Saint Thomas d’Aquin, patron des universités et des étudiants',
+    archive: 'Archive, Saint Thomas d’Aquin, patron des universités et des étudiants',
   },
   {
     periode: 'Aujourd’hui',
@@ -112,25 +128,26 @@ export const NOTRE_HISTOIRE: HistoireStep[] = [
     paragraphes: [
       'De quelques dizaines d’étudiants réunis dans une salle de classe dans les années 1980, la Paroisse Universitaire Saint-Thomas-d’Aquin s’est transformée en une institution incontournable à Douala. Agrandie et modernisée au fil des décennies, elle rassemble chaque semaine des milliers de fidèles, portés par le dynamisme de ses chorales, de ses mouvements d’action catholique et de son engagement au service de la jeunesse.',
     ],
-    archive: 'Archive — La Paroisse Universitaire Saint-Thomas-d’Aquin à Douala',
+    archive: 'Archive, La Paroisse Universitaire Saint-Thomas-d’Aquin à Douala',
   },
 ]
+
 export const FOUND: [string, string, string][] = [
   ['Père Antoine Moreau', 'Premier curé, 1958 à 1969', 'Il célébrait la première messe sur un autel fait de caisses de bois.'],
   ['Marguerite Nkodo', 'Première catéchiste', 'Elle a réuni les premiers enfants dans sa cour, chaque jeudi.'],
   ['Joseph Tamba', 'Maître d’œuvre', 'Il a dirigé le chantier de la nef avec les paroissiens volontaires.'],
 ]
+
 export type Pretre = readonly [
   nom: string,
   periode: string,
   fonction: string,
   note: string,
-  photo?: string, // ex. '/pretres/nlebe.jpg' (fichier dans public/pretres/)
+  photo?: string,
 ]
 
 /** Depuis la paroisse (2002), du plus récent au plus ancien. */
 export const CURES: readonly Pretre[] = [
-  // ➜ Remplacez cette entrée par le curé actuel : nom, date d’installation, fonction, photo.
   [
     'Les frères dominicains',
     'Aujourd’hui',
@@ -139,7 +156,7 @@ export const CURES: readonly Pretre[] = [
   ],
   [
     'Père Dominique Charles, o.p.',
-    'vers 2002–2009',
+    'vers 2002 à 2009',
     'Curé de la paroisse universitaire',
     'Dominicain et médecin de formation, curé pendant sept ans. L’église est consacrée le 7 mai 2005.',
   ],
@@ -149,13 +166,13 @@ export const CURES: readonly Pretre[] = [
 export const AUMONIERS: readonly Pretre[] = [
   [
     'Abbé Léon Marie Bolla',
-    'vers 1994–1995',
+    'vers 1994 à 1995',
     'Curé de Saint-Paul de Nylon, vicaire épiscopal',
     'L’archevêque lui confie les étudiants pendant une année exigeante, pour garder des célébrations régulières.',
   ],
   [
     'Abbé Fotso',
-    'vers 1990–1994',
+    'vers 1990 à 1994',
     'Aumônier',
     'Aumônier à la création de l’Université de Douala en 1993, il est affecté ailleurs l’année suivante.',
   ],
@@ -167,17 +184,11 @@ export const AUMONIERS: readonly Pretre[] = [
   ],
   [
     'Abbé Joseph Nlebe',
-    '1986–1990',
+    '1986 à 1990',
     'Premier aumônier',
     'Installé le 22 février 1986, il pose les bases de la communauté catholique du campus avec la JECU. Une messe est célébrée chaque samedi soir.',
   ],
 ]
 
 export const PRIETRES: readonly Pretre[] = [...CURES, ...AUMONIERS]
-export const ANNO: [string, number, number, string][] = [
-  ['Toiture en brique', 30, 46, 'La brique rouge évoque la terre cuite des maisons du quartier : l’église est faite du même matériau que ses fidèles.'],
-  ['Fenêtres cintrées', 18, 77, 'Leurs arcs rappellent les voûtes romanes et laissent entrer une lumière douce pendant la prière.'],
-  ['Colonnes blanches', 75, 72, 'Le portique à quatre colonnes annonce le seuil : on passe de la rue à la maison de Dieu.'],
-  ['Crucifix', 75, 25, 'Placé au sommet de la façade, il se voit de loin et dit à qui passe où se trouve le cœur de la foi.'],
-  ['Fronton', 86, 38, 'Le triangle du fronton, hérité des temples antiques, couronne l’entrée et lui donne sa dignité.'],
-]
+
