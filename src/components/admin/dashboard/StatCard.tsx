@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-
+import { CalendarDays } from 'lucide-react';
 export function StatCard({
   label,
   value,

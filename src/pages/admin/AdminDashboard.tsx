@@ -1,12 +1,8 @@
-
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  LayoutDashboard,
   CalendarDays,
   Tags,
   Users,
-  Settings,
-  LogOut,
   Menu,
   X,
   ChevronRight,
@@ -14,7 +10,6 @@ import {
   ShieldCheck,
   Clock3,
   Plus,
-  Search,
   RefreshCw,
   Pencil,
   Trash2,
@@ -164,6 +159,9 @@ function getErrorMessage(data: any, fallback: string) {
   return data?.message || data?.error || fallback
 }
 
+const inputClassName =
+  'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-red-400'
+
 export default function AdminDashboard() {
   const [activeMenu, setActiveMenu] = useState('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -208,7 +206,6 @@ export default function AdminDashboard() {
   })
 
   const [showPasswords, setShowPasswords] = useState(false)
-
 
   const notify = useCallback((type: Toast['type'], message: string) => {
     setToast({ type, message })
@@ -407,7 +404,8 @@ export default function AdminDashboard() {
       categoryId: event.categoryId || event.category?.id || '',
       recurrenceType: event.recurrenceType || 'NONE',
       weekdays: event.weekdays || [],
-      recurrenceStart: event.recurrenceStart?.slice(0, 10) ||
+      recurrenceStart:
+        event.recurrenceStart?.slice(0, 10) ||
         new Date().toISOString().slice(0, 10),
       isPermanent: event.isPermanent ?? true,
       recurrenceEnd: event.recurrenceEnd?.slice(0, 10) || '',
@@ -433,10 +431,7 @@ export default function AdminDashboard() {
       return
     }
 
-    if (
-      !eventForm.isPermanent &&
-      !eventForm.recurrenceEnd
-    ) {
+    if (!eventForm.isPermanent && !eventForm.recurrenceEnd) {
       notify('error', 'La date de fin est obligatoire.')
       return
     }
@@ -1080,7 +1075,7 @@ export default function AdminDashboard() {
                     type="button"
                     onClick={() => cancelOccurrence(occurrence)}
                     className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                    title="Annuler l'occurrence"
+                    title="Annuler cette occurrence"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -1098,7 +1093,7 @@ export default function AdminDashboard() {
       <SectionHeading
         eyebrow="Organisation"
         title="Catégories"
-        description="Organise les événements avec des catégories."
+        description="Classez vos événements par catégorie."
         action={
           <PrimaryButton onClick={openCreateCategory}>
             <Plus size={17} /> Nouvelle catégorie
@@ -1109,7 +1104,7 @@ export default function AdminDashboard() {
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SearchBox search={search} onSearchChange={setSearch} />
         <p className="text-xs text-gray-400">
-          {filteredCategories.length} catégorie(s)
+          {filteredCategories.length} résultat(s)
         </p>
       </div>
 
@@ -1118,38 +1113,39 @@ export default function AdminDashboard() {
           <motion.div
             layout
             key={category.id}
-            whileHover={{ y: -3 }}
-            className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-lg hover:shadow-gray-200/40"
+            className="flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:border-red-100"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="grid size-11 place-items-center rounded-xl bg-red-50 text-red-600">
-                <Tags size={20} />
+            <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="grid size-10 place-items-center rounded-xl bg-red-50 text-red-600">
+                  <Tags size={18} />
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => openEditCategory(category)}
+                    className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                    title="Modifier"
+                  >
+                    <Pencil size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteCategory(category)}
+                    className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => openEditCategory(category)}
-                  className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
-                  title="Modifier"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => deleteCategory(category)}
-                  className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
-                  title="Supprimer"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              <h3 className="mt-4 font-bold text-gray-900">
+                {category.name}
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-gray-400">
+                {category.description || 'Aucune description'}
+              </p>
             </div>
-            <h3 className="mt-4 font-bold text-gray-900">
-              {category.name}
-            </h3>
-            <p className="mt-2 min-h-10 text-sm leading-relaxed text-gray-400">
-              {category.description || 'Aucune description.'}
-            </p>
           </motion.div>
         ))}
 
@@ -1158,7 +1154,7 @@ export default function AdminDashboard() {
             <EmptyState
               icon={Tags}
               title="Aucune catégorie"
-              description="Ajoute une catégorie pour organiser les événements."
+              description="Ajoutez une catégorie pour organiser vos événements."
             />
           </div>
         )}
@@ -1169,25 +1165,23 @@ export default function AdminDashboard() {
   const renderAdmins = () => {
     if (!profile?.isSuperAdmin) {
       return (
-        <div className="rounded-2xl border border-gray-100 bg-white">
-          <EmptyState
-            icon={LockKeyhole}
-            title="Accès réservé"
-            description="Seul le superadministrateur peut gérer les comptes administrateurs."
-          />
-        </div>
+        <EmptyState
+          icon={ShieldCheck}
+          title="Accès réservé au super administrateur"
+          description="Votre compte ne dispose pas des droits de gestion des administrateurs."
+        />
       )
     }
 
     return (
       <>
         <SectionHeading
-          eyebrow="Sécurité et utilisateurs"
+          eyebrow="Sécurité et accès"
           title="Administrateurs"
-          description="Crée et gère les comptes des administrateurs de la plateforme."
+          description="Gérez les comptes administrateurs de la plateforme."
           action={
             <PrimaryButton onClick={openCreateAdmin}>
-              <Plus size={17} /> Ajouter un administrateur
+              <Plus size={17} /> Nouvel administrateur
             </PrimaryButton>
           }
         />
@@ -1200,86 +1194,68 @@ export default function AdminDashboard() {
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-          {filteredAdmins.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title="Aucun administrateur"
-              description="Aucun compte ne correspond à ta recherche."
-            />
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {filteredAdmins.map((admin) => (
-                <div
-                  key={admin.id}
-                  className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="grid size-11 shrink-0 place-items-center rounded-full bg-red-50 text-red-600">
-                      <UserRound size={20} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-gray-900">
-                        {admin.email}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-400">
-                        {admin.isSuperAdmin
-                          ? 'Superadministrateur'
-                          : 'Administrateur'}
-                      </p>
-                    </div>
+          <div className="divide-y divide-gray-100">
+            {filteredAdmins.map((admin) => (
+              <div
+                key={admin.id}
+                className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="grid size-11 place-items-center rounded-full bg-red-50 text-red-600">
+                    <UserRound size={20} />
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`rounded-full px-3 py-1.5 text-[10px] font-bold ${
-                        admin.isActive
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      {admin.isActive ? 'Actif' : 'Révoqué'}
-                    </span>
-
-                    {!admin.isSuperAdmin && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => openEditAdmin(admin)}
-                          className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                          title="Modifier"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        {admin.isActive ? (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              changeAdminStatus(admin, 'revoke')
-                            }
-                            className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                            title="Révoquer"
-                          >
-                            <PowerOff size={16} />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              changeAdminStatus(admin, 'restore')
-                            }
-                            className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-green-200 hover:bg-green-50 hover:text-green-600"
-                            title="Réactiver"
-                          >
-                            <Power size={16} />
-                          </button>
-                        )}
-                      </>
-                    )}
+                  <div>
+                    <p className="font-bold text-gray-900">{admin.email}</p>
+                    <p className="mt-1 text-xs text-gray-400">
+                      {admin.isSuperAdmin
+                        ? 'Super administrateur'
+                        : 'Administrateur'}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`rounded-full px-3 py-1 text-[10px] font-bold ${
+                      admin.isActive
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50 text-red-600'
+                    }`}
+                  >
+                    {admin.isActive ? 'Actif' : 'Révoqué'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => openEditAdmin(admin)}
+                    className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                    title="Modifier"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  {!admin.isSuperAdmin &&
+                    (admin.isActive ? (
+                      <button
+                        type="button"
+                        onClick={() => changeAdminStatus(admin, 'revoke')}
+                        className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                        title="Révoquer"
+                      >
+                        <PowerOff size={16} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => changeAdminStatus(admin, 'restore')}
+                        className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-green-200 hover:bg-green-50 hover:text-green-600"
+                        title="Réactiver"
+                      >
+                        <Power size={16} />
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </>
     )
@@ -1288,614 +1264,529 @@ export default function AdminDashboard() {
   const renderSettings = () => (
     <>
       <SectionHeading
-        eyebrow="Compte personnel"
+        eyebrow="Compte"
         title="Paramètres"
-        description="Modifie les informations et les identifiants de ton compte."
+        description="Modifiez votre adresse email ou votre mot de passe."
       />
 
-      <div className="grid gap-5 xl:grid-cols-3">
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm xl:col-span-2">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-xl bg-red-50 text-red-600">
-              <UserRound size={21} />
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900">Mon profil</h3>
-              <p className="mt-1 text-xs text-gray-400">
-                Informations de connexion
-              </p>
-            </div>
-          </div>
+      <div className="max-w-xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <form onSubmit={saveProfile} className="space-y-4">
+          <Field
+            label="Adresse email"
+            type="email"
+            required
+            value={profileForm.email}
+            onChange={(value) =>
+              setProfileForm({
+                ...profileForm,
+                email: value
+              })
+            }
+          />
 
-          <form onSubmit={saveProfile} className="space-y-5">
+          <div>
             <Field
-              label="Adresse e-mail"
-              type="email"
-              value={profileForm.email}
-              onChange={(value) =>
-                setProfileForm((previous) => ({
-                  ...previous,
-                  email: value
-                }))
-              }
-              required
-            />
-
-            <Field
-              label="Mot de passe actuel (obligatoire pour enregistrer)"
+              label="Mot de passe actuel"
               type={showPasswords ? 'text' : 'password'}
+              required
               value={profileForm.currentPassword}
               onChange={(value) =>
-                setProfileForm((previous) => ({
-                  ...previous,
+                setProfileForm({
+                  ...profileForm,
                   currentPassword: value
-                }))
+                })
               }
-              required
             />
-
-            <Field
-              label="Nouveau mot de passe (facultatif)"
-              type={showPasswords ? 'text' : 'password'}
-              value={profileForm.password}
-              onChange={(value) =>
-                setProfileForm((previous) => ({
-                  ...previous,
-                  password: value
-                }))
-              }
-              placeholder="8 caractères minimum"
-            />
-
             <button
               type="button"
-              onClick={() => setShowPasswords((value) => !value)}
-              className="flex items-center gap-2 text-xs font-semibold text-gray-500 transition hover:text-red-600"
+              onClick={() => setShowPasswords(!showPasswords)}
+              className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700"
             >
               {showPasswords ? <EyeOff size={15} /> : <Eye size={15} />}
               {showPasswords ? 'Masquer les mots de passe' : 'Afficher les mots de passe'}
             </button>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-5">
-              <p className="text-xs text-gray-400">
-                Le mot de passe actuel est nécessaire pour toute modification.
-              </p>
-              <PrimaryButton type="submit" disabled={saving}>
-                {saving ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Save size={16} />
-                )}
-                Enregistrer
-              </PrimaryButton>
-            </div>
-          </form>
-        </div>
-
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <div className="mb-3 grid size-11 place-items-center rounded-xl bg-red-50 text-red-600">
-              <ShieldCheck size={21} />
-            </div>
-            <h3 className="font-bold text-gray-900">Sécurité du compte</h3>
-            <p className="mt-2 text-sm leading-relaxed text-gray-500">
-              Ton espace est protégé par une authentification administrateur.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-green-700">
-              <CheckCircle2 size={16} />
-              Session vérifiée
-            </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Type de compte
-            </p>
-            <p className="mt-2 font-bold text-gray-900">
-              {profile?.isSuperAdmin
-                ? 'Superadministrateur'
-                : 'Administrateur'}
-            </p>
-            <p className="mt-2 text-xs text-gray-400">
-              {profile?.email}
-            </p>
+          <Field
+            label="Nouveau mot de passe (optionnel)"
+            type={showPasswords ? 'text' : 'password'}
+            value={profileForm.password}
+            onChange={(value) =>
+              setProfileForm({
+                ...profileForm,
+                password: value
+              })
+            }
+            placeholder="Laisser vide pour ne pas changer"
+          />
+
+          <div className="pt-2">
+            <PrimaryButton type="submit" disabled={saving}>
+              {saving ? (
+                <Loader2 size={17} className="animate-spin" />
+              ) : (
+                <Save size={17} />
+              )}
+              Enregistrer les modifications
+            </PrimaryButton>
           </div>
-        </div>
+        </form>
       </div>
     </>
   )
 
+  const renderContent = () => {
+    switch (activeMenu) {
+      case 'dashboard':
+        return renderDashboard()
+      case 'events':
+        return renderEvents()
+      case 'calendar':
+        return renderCalendar()
+      case 'categories':
+        return renderCategories()
+      case 'admins':
+        return renderAdmins()
+      case 'settings':
+        return renderSettings()
+      default:
+        return renderDashboard()
+    }
+  }
+
   if (loading) {
     return (
-      <div className="grid min-h-screen place-items-center bg-gray-50">
-        <div className="text-center">
-          <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-red-600 text-xl font-black text-white shadow-lg shadow-red-200">
-            A
-          </div>
-          <Loader2 size={23} className="mx-auto mt-5 animate-spin text-red-600" />
-          <p className="mt-3 text-sm font-semibold text-gray-500">
-            Chargement de votre espace...
-          </p>
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="flex items-center gap-3 text-sm font-medium text-gray-600">
+          <Loader2 size={20} className="animate-spin text-red-600" />
+          Chargement de l'espace administrateur...
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="flex min-h-screen">
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-gray-100 bg-white lg:fixed lg:inset-y-0 lg:flex">
-          <SidebarContent profile={profile} activeMenu={activeMenu} navigate={navigate} handleLogout={handleLogout} />
-        </aside>
+    <div className="flex min-h-screen bg-gray-50 text-gray-900">
+      <aside className="hidden w-64 shrink-0 border-r border-gray-200 bg-white lg:block">
+<SidebarContent
+  activeMenu={activeMenu}
+  profile={profile}
+  navigate={navigate}
+  handleLogout={handleLogout}
+/>
+      </aside>
 
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <>
-              <motion.button
-                type="button"
-                aria-label="Fermer le menu"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setMobileMenuOpen(false)}
-                className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-              />
-
-              <motion.aside
-                initial={{ x: -290 }}
-                animate={{ x: 0 }}
-                exit={{ x: -290 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-2xl lg:hidden"
-              >
-                <div className="absolute right-3 top-5 z-10">
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-                <SidebarContent profile={profile} activeMenu={activeMenu} navigate={navigate} handleLogout={handleLogout} />
-              </motion.aside>
-            </>
-          )}
-        </AnimatePresence>
-
-        <main className="min-w-0 flex-1 lg:ml-64">
-          <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-gray-100 bg-white/90 px-4 backdrop-blur-md sm:px-8">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(true)}
-                className="rounded-xl p-2 text-gray-600 transition hover:bg-gray-100 active:scale-95 lg:hidden"
-                aria-label="Ouvrir le menu"
-              >
-                <Menu size={22} />
-              </button>
-              <PageTitle activeMenu={activeMenu} />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={refreshSection}
-                disabled={sectionLoading}
-                aria-label="Actualiser"
-                className="rounded-xl border border-gray-100 p-2.5 text-gray-500 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
-              >
-                <RefreshCw
-                  size={18}
-                  className={sectionLoading ? 'animate-spin' : ''}
-                />
-              </button>
-
-              <div className="hidden h-10 items-center gap-2 rounded-xl border border-gray-100 px-3 sm:flex">
-                <div className="grid size-7 place-items-center rounded-full bg-red-100 text-xs font-bold text-red-600">
-                  {profile?.email?.charAt(0).toUpperCase() || 'A'}
-                </div>
-                <span className="max-w-40 truncate text-xs font-semibold text-gray-600">
-                  {profile?.email || 'Administrateur'}
-                </span>
-              </div>
-            </div>
-          </header>
-
-          <div className="p-4 sm:p-8">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeMenu}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-              >
-                {activeMenu === 'dashboard' && renderDashboard()}
-                {activeMenu === 'events' && renderEvents()}
-                {activeMenu === 'calendar' && renderCalendar()}
-                {activeMenu === 'categories' && renderCategories()}
-                {activeMenu === 'admins' && renderAdmins()}
-                {activeMenu === 'settings' && renderSettings()}
-              </motion.div>
-            </AnimatePresence>
-
-            <footer className="mt-10 border-t border-gray-200 py-5 text-center text-xs text-gray-400">
-              AQBE Administration · Espace de gestion sécurisé
-            </footer>
-          </div>
-        </main>
-      </div>
-
-      {/* Notifications */}
       <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -15, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.97 }}
-            className={`fixed right-4 top-24 z-[100] flex max-w-sm items-start gap-3 rounded-2xl border bg-white p-4 shadow-xl ${
-              toast.type === 'success'
-                ? 'border-green-100'
-                : 'border-red-100'
-            }`}
-            role="status"
-          >
-            {toast.type === 'success' ? (
-              <CheckCircle2 size={20} className="shrink-0 text-green-600" />
-            ) : (
-              <AlertCircle size={20} className="shrink-0 text-red-600" />
-            )}
-            <p className="text-sm font-semibold text-gray-700">
-              {toast.message}
-            </p>
-            <button
-              type="button"
-              onClick={() => setToast(null)}
-              className="ml-2 text-gray-400 hover:text-gray-700"
-              aria-label="Fermer la notification"
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/40"
+            />
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 26, stiffness: 300 }}
+              className="fixed inset-y-0 left-0 z-10 w-64 bg-white shadow-xl"
             >
-              <X size={16} />
-            </button>
-          </motion.div>
+              <div className="flex items-center justify-end p-2">
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+<SidebarContent
+  activeMenu={activeMenu}
+  profile={profile}
+  navigate={navigate}
+  handleLogout={handleLogout}
+/>
+            </motion.aside>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* Formulaire événement */}
-      <AnimatePresence>
-        {eventModal && (
-          <Modal
-            title={editingEvent ? 'Modifier un événement' : 'Créer un événement'}
-            description="Configure les informations et la programmation de l'événement."
-            onClose={() => setEventModal(false)}
-          >
-            <form onSubmit={saveEvent} className="space-y-4">
-              <Field
-                label="Titre"
-                value={eventForm.title}
-                onChange={(value) =>
-                  setEventForm((previous) => ({ ...previous, title: value }))
-                }
-                placeholder="Nom de l'événement"
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/90 px-4 backdrop-blur sm:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="rounded-xl border border-gray-200 p-2 text-gray-600 hover:bg-gray-50 lg:hidden"
+            >
+              <Menu size={20} />
+            </button>
+            <PageTitle activeMenu={activeMenu} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={refreshSection}
+              disabled={sectionLoading}
+              className="rounded-xl border border-gray-200 p-2.5 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+              title="Actualiser"
+            >
+              <RefreshCw
+                size={16}
+                className={sectionLoading ? 'animate-spin' : ''}
+              />
+            </button>
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6 lg:p-8">
+          {renderContent()}
+        </main>
+      </div>
+
+      {eventModal && (
+        <Modal
+          title={
+            editingEvent ? "Modifier l'événement" : 'Nouvel événement'
+          }
+          description="Renseignez les informations et la planification de l'événement."
+          onClose={() => setEventModal(false)}
+        >
+          <form onSubmit={saveEvent} className="space-y-4">
+            <Field
+              label="Titre"
+              type="text"
+              required
+              value={eventForm.title}
+              onChange={(value) =>
+                setEventForm({ ...eventForm, title: value })
+              }
+            />
+
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-gray-700">
+                Catégorie
+              </label>
+              <select
                 required
+                value={eventForm.categoryId}
+                onChange={(event) =>
+                  setEventForm({
+                    ...eventForm,
+                    categoryId: event.target.value
+                  })
+                }
+                className={inputClassName}
+              >
+                <option value="">Choisir une catégorie</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-gray-700">
+                Description
+              </label>
+              <textarea
+                rows={3}
+                value={eventForm.description}
+                onChange={(event) =>
+                  setEventForm({
+                    ...eventForm,
+                    description: event.target.value
+                  })
+                }
+                className={inputClassName}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label="Heure de début"
+                type="time"
+                required
+                value={eventForm.startTime}
+                onChange={(value) =>
+                  setEventForm({
+                    ...eventForm,
+                    startTime: value
+                  })
+                }
               />
 
-              <label className="block">
-                <span className="mb-2 block text-xs font-bold text-gray-600">
-                  Description
-                </span>
-                <textarea
-                  value={eventForm.description}
-                  onChange={(event) =>
-                    setEventForm((previous) => ({
-                      ...previous,
-                      description: event.target.value
-                    }))
-                  }
-                  rows={3}
-                  className="w-full resize-y rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-red-400 focus:ring-4 focus:ring-red-50"
-                  placeholder="Description facultative"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-xs font-bold text-gray-600">
-                  Catégorie
-                </span>
-                <select
-                  value={eventForm.categoryId}
-                  onChange={(event) =>
-                    setEventForm((previous) => ({
-                      ...previous,
-                      categoryId: event.target.value
-                    }))
-                  }
-                  required
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-400"
-                >
-                  <option value="">Sélectionner une catégorie</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field
-                  label="Heure de début"
-                  type="time"
-                  value={eventForm.startTime}
-                  onChange={(value) =>
-                    setEventForm((previous) => ({
-                      ...previous,
-                      startTime: value
-                    }))
-                  }
-                  required
-                />
-                <Field
-                  label="Heure de fin"
-                  type="time"
-                  value={eventForm.endTime}
-                  onChange={(value) =>
-                    setEventForm((previous) => ({
-                      ...previous,
-                      endTime: value
-                    }))
-                  }
-                  required
-                />
-              </div>
-
-              <label className="block">
-                <span className="mb-2 block text-xs font-bold text-gray-600">
-                  Type de récurrence
-                </span>
-                <select
-                  value={eventForm.recurrenceType}
-                  onChange={(event) =>
-                    setEventForm((previous) => ({
-                      ...previous,
-                      recurrenceType: event.target.value as EventItem['recurrenceType'],
-                      weekdays: []
-                    }))
-                  }
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-400"
-                >
-                  <option value="NONE">Aucune récurrence</option>
-                  <option value="DAILY">Tous les jours</option>
-                  <option value="WEEKDAYS">Du lundi au vendredi</option>
-                  <option value="WEEKLY">Jours de la semaine personnalisés</option>
-                </select>
-              </label>
-
-              {eventForm.recurrenceType === 'WEEKLY' && (
-                <div>
-                  <p className="mb-3 text-xs font-bold text-gray-600">
-                    Jours de répétition
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {weekdays.map((day) => {
-                      const selected = eventForm.weekdays.includes(day.value)
-                      return (
-                        <button
-                          key={day.value}
-                          type="button"
-                          onClick={() =>
-                            setEventForm((previous) => ({
-                              ...previous,
-                              weekdays: selected
-                                ? previous.weekdays.filter(
-                                    (value) => value !== day.value
-                                  )
-                                : [...previous.weekdays, day.value]
-                            }))
-                          }
-                          className={`rounded-xl border px-3 py-2 text-xs font-semibold transition active:scale-95 ${
-                            selected
-                              ? 'border-red-600 bg-red-600 text-white'
-                              : 'border-gray-200 text-gray-500 hover:border-red-200 hover:bg-red-50'
-                          }`}
-                        >
-                          {day.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
               <Field
-                label="Date de début de programmation"
+                label="Heure de fin"
+                type="time"
+                required
+                value={eventForm.endTime}
+                onChange={(value) =>
+                  setEventForm({
+                    ...eventForm,
+                    endTime: value
+                  })
+                }
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-gray-700">
+                Récurrence
+              </label>
+              <select
+                value={eventForm.recurrenceType}
+                onChange={(event) =>
+                  setEventForm({
+                    ...eventForm,
+                    recurrenceType: event.target
+                      .value as EventItem['recurrenceType']
+                  })
+                }
+                className={inputClassName}
+              >
+                <option value="NONE">Aucune (ponctuel)</option>
+                <option value="WEEKLY">Hebdomadaire</option>
+                <option value="WEEKDAYS">Jours ouvrés</option>
+                <option value="DAILY">Quotidienne</option>
+              </select>
+            </div>
+
+            {eventForm.recurrenceType === 'WEEKLY' && (
+              <div>
+                <span className="mb-1.5 block text-xs font-bold text-gray-700">
+                  Jours de la semaine
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {weekdays.map((day) => {
+                    const active = eventForm.weekdays.includes(day.value)
+                    return (
+                      <button
+                        key={day.value}
+                        type="button"
+                        onClick={() =>
+                          setEventForm((prev) => ({
+                            ...prev,
+                            weekdays: active
+                              ? prev.weekdays.filter((d) => d !== day.value)
+                              : [...prev.weekdays, day.value]
+                          }))
+                        }
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
+                          active
+                            ? 'border-red-600 bg-red-600 text-white'
+                            : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        {day.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label="Date de début"
                 type="date"
+                required
                 value={eventForm.recurrenceStart}
                 onChange={(value) =>
-                  setEventForm((previous) => ({
-                    ...previous,
+                  setEventForm({
+                    ...eventForm,
                     recurrenceStart: value
-                  }))
+                  })
                 }
-                required
               />
-
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <input
-                  type="checkbox"
-                  checked={eventForm.isPermanent}
-                  onChange={(event) =>
-                    setEventForm((previous) => ({
-                      ...previous,
-                      isPermanent: event.target.checked
-                    }))
-                  }
-                  className="size-4 accent-red-600"
-                />
-                <span>
-                  <span className="block text-sm font-bold text-gray-700">
-                    Programmation permanente
-                  </span>
-                  <span className="mt-1 block text-xs text-gray-400">
-                    Aucune date de fin définie
-                  </span>
-                </span>
-              </label>
 
               {!eventForm.isPermanent && (
                 <Field
                   label="Date de fin"
                   type="date"
+                  required
                   value={eventForm.recurrenceEnd}
                   onChange={(value) =>
-                    setEventForm((previous) => ({
-                      ...previous,
+                    setEventForm({
+                      ...eventForm,
                       recurrenceEnd: value
-                    }))
+                    })
                   }
-                  required
                 />
               )}
+            </div>
 
-              <div className="flex justify-end gap-3 border-t border-gray-100 pt-5">
-                <button
-                  type="button"
-                  onClick={() => setEventModal(false)}
-                  className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-500 transition hover:bg-gray-50"
-                >
-                  Annuler
-                </button>
-                <PrimaryButton type="submit" disabled={saving}>
-                  {saving ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <Save size={16} />
-                  )}
-                  {editingEvent ? 'Enregistrer' : 'Créer'}
-                </PrimaryButton>
-              </div>
-            </form>
-          </Modal>
-        )}
-      </AnimatePresence>
-
-      {/* Formulaire catégorie */}
-      <AnimatePresence>
-        {categoryModal && (
-          <Modal
-            title={editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
-            description="Les catégories permettent de classer les événements."
-            onClose={() => setCategoryModal(false)}
-          >
-            <form onSubmit={saveCategory} className="space-y-5">
-              <Field
-                label="Nom"
-                value={categoryForm.name}
-                onChange={(value) =>
-                  setCategoryForm((previous) => ({
-                    ...previous,
-                    name: value
-                  }))
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={eventForm.isPermanent}
+                onChange={(event) =>
+                  setEventForm({
+                    ...eventForm,
+                    isPermanent: event.target.checked
+                  })
                 }
-                placeholder="Nom de la catégorie"
-                required
+                className="rounded border-gray-300 text-red-600 focus:ring-red-500"
               />
-              <label className="block">
-                <span className="mb-2 block text-xs font-bold text-gray-600">
-                  Description
-                </span>
-                <textarea
-                  rows={3}
-                  value={categoryForm.description}
-                  onChange={(event) =>
-                    setCategoryForm((previous) => ({
-                      ...previous,
-                      description: event.target.value
-                    }))
-                  }
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-4 focus:ring-red-50"
-                  placeholder="Description facultative"
-                />
+              Récurrence permanente (sans date de fin)
+            </label>
+
+            <div className="flex justify-end gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => setEventModal(false)}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+              >
+                Annuler
+              </button>
+              <PrimaryButton type="submit" disabled={saving}>
+                {saving && <Loader2 size={16} className="animate-spin" />}
+                Enregistrer
+              </PrimaryButton>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {categoryModal && (
+        <Modal
+          title={
+            editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie'
+          }
+          description="Définissez le nom et la description de la catégorie."
+          onClose={() => setCategoryModal(false)}
+        >
+          <form onSubmit={saveCategory} className="space-y-4">
+            <Field
+              label="Nom"
+              type="text"
+              required
+              value={categoryForm.name}
+              onChange={(value) =>
+                setCategoryForm({
+                  ...categoryForm,
+                  name: value
+                })
+              }
+            />
+
+            <div>
+              <label className="mb-1.5 block text-xs font-bold text-gray-700">
+                Description
               </label>
-              <div className="flex justify-end gap-3 border-t border-gray-100 pt-5">
-                <button
-                  type="button"
-                  onClick={() => setCategoryModal(false)}
-                  className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-500"
-                >
-                  Annuler
-                </button>
-                <PrimaryButton type="submit" disabled={saving}>
-                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  Enregistrer
-                </PrimaryButton>
-              </div>
-            </form>
-          </Modal>
-        )}
-      </AnimatePresence>
-
-      {/* Formulaire administrateur */}
-      <AnimatePresence>
-        {adminModal && (
-          <Modal
-            title={
-              editingAdmin
-                ? 'Modifier un administrateur'
-                : 'Créer un administrateur'
-            }
-            description="La gestion des autres comptes est réservée au superadministrateur."
-            onClose={() => setAdminModal(false)}
-          >
-            <form onSubmit={saveAdmin} className="space-y-5">
-              <Field
-                label="Adresse e-mail"
-                type="email"
-                value={adminForm.email}
-                onChange={(value) =>
-                  setAdminForm((previous) => ({
-                    ...previous,
-                    email: value
-                  }))
+              <textarea
+                rows={3}
+                value={categoryForm.description}
+                onChange={(event) =>
+                  setCategoryForm({
+                    ...categoryForm,
+                    description: event.target.value
+                  })
                 }
-                required
+                className={inputClassName}
               />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => setCategoryModal(false)}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+              >
+                Annuler
+              </button>
+              <PrimaryButton type="submit" disabled={saving}>
+                {saving && <Loader2 size={16} className="animate-spin" />}
+                Enregistrer
+              </PrimaryButton>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {adminModal && (
+        <Modal
+          title={
+            editingAdmin
+              ? "Modifier l'administrateur"
+              : 'Nouvel administrateur'
+          }
+          description="Gérez les identifiants d'accès de ce compte administrateur."
+          onClose={() => setAdminModal(false)}
+        >
+          <form onSubmit={saveAdmin} className="space-y-4">
+            <Field
+              label="Adresse email"
+              type="email"
+              required
+              value={adminForm.email}
+              onChange={(value) =>
+                setAdminForm({ ...adminForm, email: value })
+              }
+            />
+
+            <div className="relative">
               <Field
                 label={
                   editingAdmin
-                    ? 'Nouveau mot de passe (facultatif)'
+                    ? 'Nouveau mot de passe (optionnel)'
                     : 'Mot de passe'
                 }
                 type="password"
+                required={!editingAdmin}
                 value={adminForm.password}
                 onChange={(value) =>
-                  setAdminForm((previous) => ({
-                    ...previous,
+                  setAdminForm({
+                    ...adminForm,
                     password: value
-                  }))
+                  })
                 }
-                placeholder={
-                  editingAdmin
-                    ? 'Laisser vide pour ne pas modifier'
-                    : '8 caractères minimum'
-                }
-                required={!editingAdmin}
               />
-              <div className="flex justify-end gap-3 border-t border-gray-100 pt-5">
-                <button
-                  type="button"
-                  onClick={() => setAdminModal(false)}
-                  className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-500"
-                >
-                  Annuler
-                </button>
-                <PrimaryButton type="submit" disabled={saving}>
-                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  Enregistrer
-                </PrimaryButton>
-              </div>
-            </form>
-          </Modal>
+              <LockKeyhole
+                size={16}
+                className="pointer-events-none absolute top-9 right-3.5 text-gray-400"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3">
+              <button
+                type="button"
+                onClick={() => setAdminModal(false)}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+              >
+                Annuler
+              </button>
+              <PrimaryButton type="submit" disabled={saving}>
+                {saving && <Loader2 size={16} className="animate-spin" />}
+                Enregistrer
+              </PrimaryButton>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            className={`fixed right-5 bottom-5 z-50 flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg ${
+              toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`}
+          >
+            {toast.type === 'success' ? (
+              <CheckCircle2 size={18} />
+            ) : (
+              <AlertCircle size={18} />
+            )}
+            <span>{toast.message}</span>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

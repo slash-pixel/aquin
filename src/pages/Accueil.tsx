@@ -10,10 +10,7 @@ import {
 } from 'motion/react'
 import {
   ArrowRight,
-  CalendarDays,
   ChevronDown,
-  Sparkles,
-  Sun,
   X,
 } from 'lucide-react'
 import Band from '../components/Band'
@@ -521,8 +518,8 @@ export default function Accueil() {
     return () => controller.abort()
   }, [])
 
-  const conf = nxt('conf')[0]
-  const ado = nxt('ado')[0]
+  void nxt('conf')[0]
+  void nxt('ado')[0]
 
   const upcomingWeekEvent =
     weekEvents.find((item) => {
@@ -555,26 +552,8 @@ export default function Accueil() {
         ? 'Réessayez dans un instant'
         : 'Consultez les horaires habituels'
 
-  const week = [
-    {
-      icon: CalendarDays,
-      k: 'Prochain événement',
-      t: weekEventTitle,
-      s: weekEventSubtitle
-    },
-    {
-      icon: Sparkles,
-      k: 'Confessions',
-      t: cap(LONG.format(conf.d)),
-      s: `${hm(conf.d)}, ${conf.place}`
-    },
-    {
-      icon: Sun,
-      k: 'Adoration',
-      t: cap(LONG.format(ado.d)),
-      s: `${hm(ado.d)}, ${ado.place}`
-    }
-  ]
+  void weekEventTitle
+  void weekEventSubtitle
 
   return (
     <MotionConfig reducedMotion="user">
