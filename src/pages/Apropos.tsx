@@ -13,6 +13,7 @@ import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
 import Rise from '../components/Rise'
 import SaintThomas from '../components/SaintThomas'
+import Footer from '../components/Footer'
 import Words from '../components/Words'
 import { DURATION, EASE, SPRING, press } from '../lib/motion'
 import { AUMONIERS, CURES, FOUND, NOTRE_HISTOIRE, type Pretre } from '../data'
@@ -706,6 +707,7 @@ export default function Apropos() {
           </p>
         </Band>
       </PageTransition>
+      <Footer/>
     </MotionConfig>
   )
 }
